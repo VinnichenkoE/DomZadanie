@@ -54,7 +54,23 @@ public class lesson2 {
                     c=c*a;
                 }
                 System.out.println(c);
+         // Задача 5
+         double sum=100.0;
+         double proc=13.5;
+         int years=3;
+         for (int i=1;i<=years;i++){
+             sum = sum + sum*proc/100;}
+        System.out.println("sum = "+sum);
+         // Задача 6
+        for (int i=1; i<=100;i++) {
+            if (i % 3 == 0 && i % 7 == 0) {
+                System.out.println(i);
             }
-
         }
-
+        for (int i=1; i<=100;i++) {
+            if ((i % 3 == 0 || i % 5 == 0) && i % 15 != 0) {
+                System.out.println(i);
+            }
+        }
+            }
+        }
