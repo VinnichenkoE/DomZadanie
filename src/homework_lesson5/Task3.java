@@ -6,7 +6,7 @@ import java.util.Random;
 public class Task3 {
     public static void main(String[] args) {
         HashSet<Integer> numbers = new HashSet<Integer>();
-        HashSet<Integer> numbersInborder = new HashSet<Integer>();
+        HashSet<Integer> numbersNotInborder = new HashSet<Integer>();
         Random random = new Random();
         int border = random.nextInt(100);
         System.out.println(border);
@@ -16,10 +16,11 @@ public class Task3 {
         }
         System.out.println(numbers.toString());
         for (int a:numbers){
-            if (a>border){
-                numbersInborder.add(a);
+            if (a<border){
+                numbersNotInborder.add(a);
             }
         }
-        System.out.println(numbersInborder.toString());
+        numbers.removeAll(numbersNotInborder);
+        System.out.println(numbers);
     }
 }
