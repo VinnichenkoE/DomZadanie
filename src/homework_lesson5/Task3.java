@@ -14,7 +14,7 @@ public class Task3 {
             int element = random.nextInt(100);
             numbers.add(element);
         }
-        System.out.println(numbers.toString());
+        System.out.println(numbers);
         for (int a:numbers){
             if (a<border){
                 numbersNotInborder.add(a);
