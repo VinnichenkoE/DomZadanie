@@ -1,0 +1,17 @@
+sergei boris 1000
+olga inna 1700
+alexey vasily 4000
+vasily ivan 3000
+alexey ivan 2400
+ivan andrei 6000
+inna vasily 1600
+boris kazbek 2500
+marina sergei 400
+vasily andrei 1000
+marina nikolay 1700
+nikolay inna 500
+marina alexey 1000
+nikolay boris 600
+andrei alexey 7000
+alexey marina 9000
+boris andrei 2000

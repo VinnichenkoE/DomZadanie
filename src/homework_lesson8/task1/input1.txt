@@ -1,0 +1,10 @@
+alexey 3000
+olga 2300
+ivan 1200
+boris 8000
+inna 0
+nikolay 1700
+vasily 3000
+marina 2000
+sergei 1200
+andrei 5600
