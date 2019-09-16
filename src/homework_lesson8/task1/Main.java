@@ -16,7 +16,7 @@ public class Main {
         };
         TreeSet<Client> list = new TreeSet<>(comp);
         FileWriter writer = new FileWriter("src/homework_lesson8/task1/output1.txt");
-        BufferedReader reader = new BufferedReader(new FileReader("src/homework_lesson8/task1/input1.txt")) ;
+        BufferedReader reader = new BufferedReader(new FileReader("src/homework_lesson8/task1/input1.txt"));
 
         try {
 
