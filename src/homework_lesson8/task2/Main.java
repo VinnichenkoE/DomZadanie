@@ -19,12 +19,16 @@ public class Main {
         while ((s = reader1.readLine()) != null){
             String[] str = s.split(" ");
             for (Client2 o: list){
-                if (o.getName() == str[0]){
+                if (o.getName().equals(str[0])){
                     int op = o.getSumm() - Integer.parseInt(str[2]);
-                    o.setSumm(op) ;
+                    if (op >= 0){
+                    o.setSumm(op);}
+                    else continue;
                 }
-                if (o.getName() == str[1]){
+                else if (o.getName().equals(str[1])){
                     int op = o.getSumm() + Integer.parseInt(str[2]);
+                    if (op>= 0)
+
                     o.setSumm(op);
                 }
             }
