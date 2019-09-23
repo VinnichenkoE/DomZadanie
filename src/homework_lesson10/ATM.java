@@ -21,11 +21,13 @@ public class ATM {
             int numberOfCard = Integer.parseInt(br.readLine());
             if (!(bank.checkClientExist(numberOfCard))) {
                 System.out.println("Неверный номер карты");
+                continue;
             }
             System.out.println("Введите PIN: ");
             input = br.readLine();
-            if (!(bank.checkPassword(Integer.parseInt(input)))){
+            if (!(bank.checkPIN(numberOfCard, Integer.parseInt(input)))){
                 System.out.println("Неверный PIN: ");
+                continue;
             }
             System.out.println("Выберите операцию: ");
             System.out.println("1. Положить деньги на счет.");

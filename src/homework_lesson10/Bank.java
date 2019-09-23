@@ -13,8 +13,8 @@ public  class Bank {
      public boolean checkClientExist(int numberOfAccount){
          return  clients.stream().anyMatch(e -> e.getNumberOfAccount() == numberOfAccount);
      }
-     public boolean checkPassword(int password){
-        return clients.stream().anyMatch(e-> e.getPIN()==password);
+     public boolean checkPIN(int numberOfAccount, int PIN){
+        return clients.stream().filter(e->e.getNumberOfAccount()==numberOfAccount).anyMatch(e-> e.getPIN()==PIN);
      }
 
      public boolean checkMoneyIsEnaught(int numberOfAccount, int sum){
