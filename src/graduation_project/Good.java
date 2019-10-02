@@ -1,5 +1,7 @@
 package graduation_project;
 
+import java.sql.Date;
+
 public class Good {
 
     private int id;
@@ -9,15 +11,15 @@ public class Good {
 
     @Override
     public String toString() {
-        return "{" +
+        return "Good{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", quantity=" + quantity +
                 '}';
     }
 
-    public  Good(int id, String name, double quantity){
 
+    public Good(int id, String name, double quantity) {
         this.id = id;
         this.name = name;
         this.quantity = quantity;
@@ -46,5 +48,6 @@ public class Good {
     public void setQuantity(double quantity) {
         this.quantity = quantity;
     }
+
 
 }

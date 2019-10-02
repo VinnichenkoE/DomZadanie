@@ -10,6 +10,7 @@ import java.util.List;
 
 public class Storage {
     private List<Good> list = new ArrayList();
+    private List<Register> registerList = new ArrayList<>();
     private final double CAPACITY = 100.0;
     private String input = "";
     private BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -19,7 +20,8 @@ public class Storage {
             add("1. Провести инвентаризацию");
             add("2. Принять товар");
             add("3. Отгрузить товр");
-            add("4. Выход");
+            add("4. Просмотреть журнал поступления-отпуска");
+            add("5. Выход");
         }
     };
     private boolean exit = true;
@@ -41,7 +43,7 @@ public class Storage {
         return input;
     }
 
-    public void selectToList() throws SQLException {
+    public void goodsToList() throws SQLException {
         SQL = "select * from goods";
         PreparedStatement preparedStatement = connection.prepareStatement(SQL);
         ResultSet resultSet = preparedStatement.executeQuery();
@@ -53,11 +55,61 @@ public class Storage {
         }
     }
 
+    public void makeAnInventory() throws SQLException {
+            goodsToList();
+            list.forEach(e -> System.out.println(e.toString()));
+            list.clear();
+        }
+
+    public boolean isCapacityEnaught(double quantity) throws SQLException {
+        return quantity + totalQuantityOfGoods() <= CAPACITY;
+    }
+
     public double totalQuantityOfGoods() {
         return list.stream().mapToDouble(e -> e.getQuantity()).sum();
     }
+    public void insertIntoRegister(int id, String contractor, Date date, double quantity) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("insert into register (id_good, contractor, date, quantity) values (?,?,?,?);");
+        preparedStatement.setInt(1,id);
+        preparedStatement.setString(2, contractor);
+        preparedStatement.setDate(3, date);
+        preparedStatement.setDouble(4, quantity);
+        preparedStatement.execute();
+    }
+    public int getIdByName(String name) {
+        return list.stream().filter(e->e.getName().equals(name)).findFirst().get().getId();
+    }
 
-    public boolean isGoodInStorageList(String name) {
+    public void addGoodAtStorage() throws SQLException {
+        System.out.println("Введите наименование товара: ");
+        String name = getInput();
+        System.out.println("Введите количество товара: ");
+        double quantity = Double.parseDouble(getInput());
+        goodsToList();
+        if (isCapacityEnaught(quantity)) {
+            System.out.println("Введите поставщика: ");
+            String contractor = getInput();
+            System.out.println("Введите дату поставки: ");
+            Date date = Date.valueOf(getInput());
+            if (isGoodInStorageList(name)) {
+                insertIntoRegister(getIdByName(name), contractor,date,quantity);
+                quantity += getQuantityFromList(name);
+                setQuantityInDB(quantity, name);
+            } else {
+                list.clear();
+                SQL = "insert into goods values (null,?,?)";
+                PreparedStatement preparedStatement = connection.prepareStatement(SQL);
+                preparedStatement.setString(1, name);
+                preparedStatement.setDouble(2, quantity);
+                preparedStatement.execute();
+                goodsToList();
+                insertIntoRegister(getIdByName(name), contractor, date, quantity);
+            }
+        } else System.out.println("Недостаточно места на складе!");
+        list.clear();
+    }
+
+    public boolean isGoodInStorageList(String name) throws SQLException {
         return list.stream().anyMatch(e -> e.getName().equals(name));
     }
     public void setQuantityInDB(Double quantity, String name) throws SQLException {
@@ -70,6 +122,46 @@ public class Storage {
     public Double getQuantityFromList(String name){
         return list.stream().filter(e->e.getName().equals(name)).findFirst().get().getQuantity();
     }
+    public void shipFromStorage() throws SQLException {
+        System.out.println("Введите наименование товара: ");
+        String name = getInput();
+        goodsToList();
+        if (isGoodInStorageList(name)){
+            System.out.println("Введите количество: ");
+            double quantity = Double.parseDouble(getInput());
+            if(getQuantityFromList(name)>= quantity){
+                double quantityToDB = getQuantityFromList(name) - quantity;
+                setQuantityInDB(quantityToDB,name);
+                quantity = -quantity;
+                System.out.println("Введите получателя: ");
+                String contractor = getInput();
+                System.out.println("Введите дату отгрузки: ");
+                Date date = Date.valueOf(getInput());
+                insertIntoRegister(getIdByName(name), contractor, date,quantity);
+            } else System.out.println("Недостаточно товара");
+        } else System.out.println("Такого товара нет на складе");
+        list.clear();
+    }
+    public void lookInRegister() throws SQLException {
+        System.out.println("Введите нпименование товара: ");
+        String name = getInput();
+        SQL = "select r.contractor, r.date, r.quantity from register r join goods g on (g.id = r.id_good) where name = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(SQL);
+        preparedStatement.setString(1, name);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            String contractor = resultSet.getString("contractor");
+            double quantity = resultSet.getDouble("quantity");
+            Date date = resultSet.getDate("date");
+            addRegister(contractor, quantity,date);
+        }
+        registerList.forEach(e -> System.out.println(e.toString()));
+        registerList.clear();
+
+    }
+    public void addRegister(String conrtactor, double quantity, Date date){
+        registerList.add(new Register(conrtactor,quantity, date));
+    }
 
     public void start() throws SQLException {
         while (exit) {
@@ -78,48 +170,18 @@ public class Storage {
 
             switch (getInput()) {
                 case "1":
-                    selectToList();
-                    list.forEach(e -> System.out.println(e.toString()));
-                    list.clear();
+                    makeAnInventory();
                     break;
                 case "2":
-                    System.out.println("Введите наименование товара: ");
-                    String name = getInput();
-                    System.out.println("Введите количество");
-                    double quantity = Double.parseDouble(getInput());
-                    selectToList();
-                    if (quantity + totalQuantityOfGoods() <= CAPACITY) {
-                        if (isGoodInStorageList(name)) {
-                            quantity  += getQuantityFromList(name);
-                            setQuantityInDB(quantity,name);
-
-                        } else {
-                            SQL = "insert into goods values (null,?,?)";
-                            PreparedStatement preparedStatement = connection.prepareStatement(SQL);
-                            preparedStatement.setString(1, name);
-                            preparedStatement.setDouble(2, quantity);
-                            preparedStatement.execute();
-                        }
-
-                    } else System.out.println("Товар не помещается на склад");
-                    list.clear();
+                    addGoodAtStorage();
                     break;
                 case "3":
-                    System.out.println("Введите нпименование товара: ");
-                    name = getInput();
-                    selectToList();
-                    if(isGoodInStorageList(name)){
-                        System.out.println("Введите количество: ");
-                        quantity = Double.parseDouble(getInput());
-                        if(getQuantityFromList(name)>=quantity){
-                            quantity = getQuantityFromList(name) - quantity;
-                            setQuantityInDB(quantity, name);
-                        }
-                        else System.out.println("Недостаточно товара на складе\n На складе осталось " + getQuantityFromList(name) + " единиц " + name);
-                    }else System.out.println("Такого товара нет на складе");
-                    list.clear();
+                    shipFromStorage();
                     break;
                 case "4":
+                    lookInRegister();
+                    break;
+                case "5":
                     System.out.println("До свидания");
                     exit = false;
                     break;
